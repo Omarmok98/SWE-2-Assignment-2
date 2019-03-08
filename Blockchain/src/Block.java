@@ -4,10 +4,11 @@ import java.security.MessageDigest;
 public class Block {
 	public String hash;
 	public String previousHash;
-	private String data;
+	private Vote data;
 	private long timeStamp;
+	private int nonce;
 	
-	Block(String data, String previousHash)
+	Block(Vote data, String previousHash)
 	{
 		this.data = data;
 		this.previousHash = previousHash;
@@ -32,8 +33,18 @@ public class Block {
 	}
 	public String calculateHash()
 	{
-		String outputHash = applySha256(this.previousHash + Long.toString(this.timeStamp) + data);
+		String outputHash = applySha256(this.previousHash + Long.toString(this.timeStamp) + Integer.toString(nonce)+ data);
 		return outputHash;
+	}
+	public void mineBlock(int difficulty)
+	{
+		String goal = new String(new char[difficulty]).replace('\0', '0');
+		while(!hash.substring(0, difficulty).equals(goal))
+		{
+			nonce++;
+			hash = calculateHash();
+		}
+		System.out.println("Block MINED!!! : " + hash);
 	}
 
 }
