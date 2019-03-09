@@ -37,15 +37,15 @@ public class main {
 		Voter v2 = new Voter("456");
 		Voter v3 = new Voter("789");
 		
-		Peer p = new Peer(v, 200);
-		Peer p2 = new Peer(v2, 3000);
-		Peer miner = new Peer(v3, 6666);
+		Peer p = new Peer(v, 2000,2001);
+		Peer p2 = new Peer(v2, 3000,3001);
+		Peer miner = new Peer(v3, 6000,6001);
 		
 		Vote s = new Vote(789,"x",v);
 		//Vote d = new Vote(753,"y",v2);
 		
 		System.out.println(Peer.peers.size());
-		System.out.println(Peer.getPorts());
+		//System.out.println(Peer.getPorts());
 		
 		p.connect();
 		p2.connect();
