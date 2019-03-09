@@ -67,7 +67,10 @@ public class Peer {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			
 			oos.writeObject(v);
+			baos.flush();
+			oos.flush();
 			final byte[] data = baos.toByteArray();
 			for (int i = 0; i < Peer.peers.size(); i++) {
 				DatagramPacket dp = new DatagramPacket(data, data.length, this.ip, Peer.peers.get(i).getPort());
@@ -92,6 +95,8 @@ public class Peer {
 			ByteArrayInputStream bais = new ByteArrayInputStream(buf);
 			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(bais));
 			Vote v = (Vote) ois.readObject();
+			bais.close();
+			ois.close();
 			//String vJson = new GsonBuilder().setPrettyPrinting().create().toJson(v);
 			System.out.println(v.choice);
 			Block b = this.mine(v);
@@ -116,7 +121,8 @@ public class Peer {
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			
 			oos.writeObject(b);
-			
+			baos.flush();
+			oos.flush();
 			
 			final byte[] data = baos.toByteArray();
 			for (int i = 0; i < Peer.peers.size(); i++) {
@@ -140,7 +146,7 @@ public class Peer {
 			
 
 			byte[] buf = new byte[5000];
-			DatagramPacket dp = new DatagramPacket(buf, 1024);
+			DatagramPacket dp = new DatagramPacket(buf, 5000);
 			
 			ds.receive(dp);
 			
