@@ -20,18 +20,14 @@ import com.google.gson.GsonBuilder;
 public class Peer {
 	Blockchain blk = new Blockchain();
 	DatagramSocket ds = null;
-	DatagramSocket dss = null;
 	InetAddress ip = null;
 	Voter voter;
-	int votePort = -1;
-	int blockPort = -1;
-	
+	int port = -1;
 	public static ArrayList<Peer> peers = new ArrayList<Peer>();
 
-	public Peer(Voter voter, int votePort,int blockPort) {
+	public Peer(Voter voter, int port) {
 		this.voter = voter;
-		this.blockPort = blockPort;
-		this.votePort = votePort;
+		this.port = port;
 		peers.add(this);
 	}
 
@@ -39,8 +35,7 @@ public class Peer {
 		try {
 
 			this.ip = InetAddress.getByName("127.0.0.1");
-			this.ds = new DatagramSocket(this.votePort);
-			this.dss = new DatagramSocket(this.blockPort);
+			this.ds = new DatagramSocket(this.port);
 			this.ds.setBroadcast(true);
 			this.ds.setSoTimeout(5000);
 			System.out.println(this.voter.id + " Connected!");
@@ -72,12 +67,13 @@ public class Peer {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			
 			oos.writeObject(v);
 			baos.flush();
 			oos.flush();
 			final byte[] data = baos.toByteArray();
 			for (int i = 0; i < Peer.peers.size(); i++) {
-				DatagramPacket dp = new DatagramPacket(data, data.length, this.ip, Peer.peers.get(i).getVotePort());
+				DatagramPacket dp = new DatagramPacket(data, data.length, this.ip, Peer.peers.get(i).getPort());
 				ds.send(dp);
 			}
 
@@ -98,14 +94,17 @@ public class Peer {
 			ds.receive(dp);
 			ByteArrayInputStream bais = new ByteArrayInputStream(buf);
 			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(bais));
-			
 			Vote v = (Vote) ois.readObject();
-			
 			bais.close();
 			ois.close();
 			//String vJson = new GsonBuilder().setPrettyPrinting().create().toJson(v);
 			System.out.println(v.choice);
 			Block b = this.mine(v);
+			for(int i=0;i<peers.size();i++)
+			{
+				peers.get(i).disconnect();
+				peers.get(i).connect();
+			}
 			
 			broadcastBlock(b);
 			
@@ -126,11 +125,10 @@ public class Peer {
 			oos.flush();
 			
 			final byte[] data = baos.toByteArray();
-			
 			for (int i = 0; i < Peer.peers.size(); i++) {
 				
-				DatagramPacket dpp = new DatagramPacket(data, data.length, this.ip, Peer.peers.get(i).getBlockPort());
-				dss.send(dpp);
+				DatagramPacket dp = new DatagramPacket(data, data.length, this.ip, Peer.peers.get(i).getPort());
+				ds.send(dp);
 				//Peer.peers.get(i).receiveBlock();
 				
 			}
@@ -148,9 +146,9 @@ public class Peer {
 			
 
 			byte[] buf = new byte[5000];
-			DatagramPacket dpp = new DatagramPacket(buf, 5000);
+			DatagramPacket dp = new DatagramPacket(buf, 5000);
 			
-			dss.receive(dpp);
+			ds.receive(dp);
 			
 			ByteArrayInputStream bais = new ByteArrayInputStream(buf);
 			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(bais));
@@ -175,21 +173,18 @@ public class Peer {
 
 	}
 
-	public int getVotePort() {
-		return this.votePort;
-	}
-	public int getBlockPort() {
-		return this.blockPort;
+	public int getPort() {
+		return this.port;
 	}
 
-	/*public static ArrayList<Integer> getPorts() {
+	public static ArrayList<Integer> getPorts() {
 		ArrayList<Integer> portsList = new ArrayList<Integer>();
 		for (int i = 0; i < peers.size(); i++) {
 			portsList.add(peers.get(i).getPort());
 		}
 		return portsList;
 
-	}*/
+	}
 
 	public Block mine(Vote v)
 			throws InvalidKeyException, NoSuchAlgorithmException, SignatureException, UnsupportedEncodingException {
