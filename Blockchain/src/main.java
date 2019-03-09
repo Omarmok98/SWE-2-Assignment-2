@@ -9,17 +9,8 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 
 public class main {
-	/*public static Blockchain getLongest(final Peer x[])
-	{
-		Blockchain blk =null;
-		for(int i=0;i<x.length;i++)
-		{
-		}
-		return blk;
-	}*/
-
 	
-	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException, SignatureException, UnknownHostException, SocketException {
+	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException, SignatureException, UnknownHostException, SocketException, ClassNotFoundException {
 		/*
 		Blockchain blk = new Blockchain();
 		Voter q = new Voter("123");
@@ -42,27 +33,31 @@ public class main {
 		blk.addBlock(s);
 		blk.PrintBlockChain();
 		*/
-		//DatagramSocket ds = new DatagramSocket(3000);
-		//DatagramSocket ds2 = new DatagramSocket(200);
-		//ds.setSoTimeout(5000);
-		//ds.setBroadcast(true);
 		Voter v = new Voter("123");
 		Voter v2 = new Voter("456");
 		Voter v3 = new Voter("789");
+		
 		Peer p = new Peer(v, 200);
 		Peer p2 = new Peer(v2, 3000);
-		Peer p3 = new Peer(v3, 6666);
+		Peer miner = new Peer(v3, 6666);
+		
+		Vote s = new Vote(789,"x",v);
+		//Vote d = new Vote(753,"y",v2);
+		
 		System.out.println(Peer.peers.size());
 		System.out.println(Peer.getPorts());
 		
-		/*p.connect();
+		p.connect();
 		p2.connect();
+		miner.connect();
+		
+		p.broadcastVote(s);
+		miner.receiveVote();
+		
+		//p.receiveBlock();
+		//p2.receiveBlock();
 		
 		
-		p.broadcast("HELLO");
-
-		p2.receive();
-		p.receive();*/
 		
 		
 		

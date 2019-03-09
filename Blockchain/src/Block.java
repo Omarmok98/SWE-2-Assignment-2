@@ -1,7 +1,7 @@
 import java.util.Date;
 import java.security.MessageDigest;
 
-public class Block {
+public class Block implements java.io.Serializable {
 	public String hash;
 	public String previousHash;
 	private Vote data;

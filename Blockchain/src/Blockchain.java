@@ -3,9 +3,9 @@ import com.google.gson.*;
 
 public class Blockchain {
 	
-	public static ArrayList<Block> blockchain = new ArrayList<Block>();
-	public static int difficulty = 4;
-	public static boolean chainValid()
+	public  ArrayList<Block> blockchain = new ArrayList<Block>();
+	public  int difficulty = 4;
+	public boolean chainValid()
 	{
 		Block curr;
 		Block prev;
@@ -28,7 +28,7 @@ public class Blockchain {
 		}
 		return true;
 	}
-	public void addBlock(Vote data)
+	public Block addBlock(Vote data)
 	{
 		int size = blockchain.size();
 		
@@ -36,12 +36,13 @@ public class Blockchain {
 		{
 			Block b = new Block(data,"0000000000000000000000000000000000000000000000000000000000000000");
 			blockchain.add(b);
+			return b;
 		}else
 		{
 			String previousHash = blockchain.get(size - 1).hash;
 			Block b = new Block(data, previousHash);
-			b.mineBlock(this.difficulty);
 			blockchain.add(b);
+			return b;
 		}
 		
 	}
