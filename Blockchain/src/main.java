@@ -53,9 +53,9 @@ public class main {
 		
 		p.broadcastVote(s);
 		miner.receiveVote();
-		
-		//p.receiveBlock();
-		//p2.receiveBlock();
+	
+		p.receiveBlock();
+		p2.receiveBlock();
 		
 		
 		
